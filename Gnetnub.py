@@ -7,6 +7,8 @@ class SingMeSheWit:
         self.hp = hp
         self.mana = mana
         self.anti = False
+        self.status = ""
+        self.useanti = 0
 
     def IsAlive(self):
         if self.hp <= 0:
@@ -20,12 +22,33 @@ class SingMeSheWit:
         print(f"________________________________________________________________________________")
         print(f"    P1 => HP: {SMSI.hp}                                          P2 => HP: {SMSII.hp}")
         print(f"          MN: {SMSI.mana}                                                 MN: {SMSII.mana}")
-        print()
-        print("          /\__/\                                                 ( )__( )") 
-        print(f"         ( ● ^ ●)                                                (● ^ ● )")
-        print("        /(______)\/                                            \/(______)\\")
-        print("          |    |                                                  |    |")
-        print("         P1: Meme                                                P2: Nunu")
+        print(f"                 {SMSI.status}                                           {SMSII.status}") 
+
+        if SMSI.anti == True and SMSII.anti == False:
+            print("                        _____")
+            print("           /\__/\      /     \                                   ( )__( )")
+            print("          ( ● ^ ●)     \     /                                   (● ^ ● )")
+            print("         /(______)\/    \   /                                  \/(______)\\")
+            print("           |    |        \_/                                      |    |")
+        elif SMSI.anti == False and SMSII.anti == True:
+            print("                                                      _____")
+            print("           /\__/\                                    /     \     ( )__( )")
+            print("          ( ● ^ ●)                                   \     /     (● ^ ● )")
+            print("         /(______)\/                                  \   /    \/(______)\\")
+            print("           |    |                                      \_/        |    |")
+        elif SMSI.anti == True and SMSII.anti == True:
+            print("                        _____                        _____")
+            print("           /\__/\      /     \                      /     \     ( )__( )")
+            print("          ( ● ^ ●)     \     /                      \     /     (● ^ ● )")
+            print("         /(______)\/    \   /                        \   /    \/(______)\\")
+            print("           |    |        \_/                          \_/        |    |")
+        else:
+            print("           /\__/\                                                ( )__( )")
+            print("          ( ● ^ ●)                                               (● ^ ● )")
+            print("         /(______)\/                                           \/(______)\\")
+            print("           |    |                                                 |    |")
+
+        print("          P1: Meme                                                P2: Nunu")        
         print("________________________________________________________________________________")
         print(f"{self.name} 》》CHOOSE")
         print("S = Small attack " \
@@ -42,97 +65,140 @@ class SingMeSheWit:
 # ฟังก์ชันใช้สกิล
 def Smallattack(player, opponent):
     player.mana -= 25
-    damage = random.randint(10, 50)
+    damage = random.randint(10, 50)    
+    if opponent.anti == True:
+        damage = 0
+        opponent.anti = False
     opponent.hp -= damage
-    return f"{damage}"
+    opponent.status = f"-{damage}"
+    player.status = ""
+
 def Mediumattack(player, opponent):
     player.mana -= 50
     if random.randint(1, 100) < 75:
         damage = random.randint(50, 75)
+        if opponent.anti == True:
+            damage = 0
+            opponent.anti = False
         opponent.hp -= damage
-        return f"{damage}"
+        opponent.status = f"-{damage}"
+        player.status = ""
     else:
-
-        return "Missed"
+        player.status = "Missed"
+        opponent.status = ""
+    
 def Largeattack(player, opponent):
     player.mana -= 75
     if random.randint(1, 100) < 50:
         damage = random.randint(150, 175)
+        if opponent.anti == True:
+            damage = 0
+            opponent.anti = False
         opponent.hp -= damage
-        return f"{damage}"
+        opponent.status = f"-{damage}"
+
+        player.status = ""
     else:
-        return "Missed"
+        player.status = "Missed"
+        opponent.status = ""
     
 def XtraLargeattack(player, opponent):
     player.mana -= 100
     if random.randint(1, 100) < 25:
         damage = random.randint(350, 500)
+        if opponent.anti == True:
+            damage = 0
+            opponent.anti = False
         opponent.hp -= damage
-        return f"{damage}"
+        opponent.status = f"-{damage}"
+        player.status = ""
     else:
-        return "Missed"
+        player.status = "Missed"
+        opponent.status = ""
     
 def Randomattack(player, opponent):
     player.mana -= 25
     damage = random.randint(0, 500)
+    if opponent.anti == True:
+            damage = 0
+            opponent.anti = False
     opponent.hp -= damage
-    return f"{damage}"
+    opponent.status = f"-{damage}"
+    player.status = ""
 
-def Purloin(player, opponent, hm): # steal
-    if random.randint(1, 100) < 50:
-        if hm == "HP":
+def Purloin(player, opponent, hm):
+    if random.randint(1, 100):
+        print(hm)
+        if hm.lower() == "hp":
             damage = random.randint(0, 100)
-            opponent.hp -= damage
+            if player.hp + damage >= 1000:
+                damage = 1000 - player.hp
             player.hp += damage
-            return f"{damage}"
-        elif hm == "MN":
+            player.status = f"+{damage}"
+            opponent.hp -= damage
+            opponent.status = f"-{damage}"               
+        elif hm.lower() == "mn":
             damage = random.randint(0, 10)
-            opponent.mana -= damage
+            if player.mana + damage >= 100:
+                damage = 100 - player.mana
+            # print(damage)
             player.mana += damage
-            return f"{damage}"
-    else:
-        return "Missed"
+            player.status = f"+{damage}"            
+            opponent.mana -= damage
+            opponent.status = f"-{damage}"
 
-def AnitMinimise(player):
+    else:
+        player.status = "Missed"
+        opponent.status = ""
+
+def AnitMinimise(player, opponent, Round):
     player.mana -= 25
     if random.randint(1, 100) < 50:
         player.anti = True
-def PurchaseMana(player, mp):
+        player.useanti = Round
+        opponent.status = "" 
+        player.status = ""     
+    else:
+        player.status = "Missed"
+        opponent.status = ""
+
+def PurchaseMana(player, opponent, mp):
     player.hp -= mp*5
     player.mana += mp
-    return f"+{mp}"
-def AddTohealthPoints(player):
+    player.status = f"+{mp}"
+    opponent.status = ""
+
+def AddTohealthPoints(player, opponent):
     player.mana -= 100
     player.hp += 250
-    return "+250"
+    player.status = "+250"
+    opponent.status = ""
 
-def Chosen(code, player, opponent):
+def Chosen(code, player, opponent, Round):
     code=code.lower()
     if code == "s" and player.mana >= 25:
-        return Smallattack(player, opponent)
+        Smallattack(player, opponent)
     elif code == "m" and player.mana >= 50:
-        return Mediumattack(player, opponent)
+        Mediumattack(player, opponent)
     elif code == "l" and player.mana >= 75:
-        return Largeattack(player, opponent)
+        Largeattack(player, opponent)
     elif code == "xl" and player.mana >= 100:
-        return XtraLargeattack(player, opponent)
+        XtraLargeattack(player, opponent)
     elif code == "r" and player.mana >= 25:
-        return Randomattack(player, opponent)
+        Randomattack(player, opponent)
     elif code == "p" and player.mana >= 0:
-        hm = input("Purloin HP or MN: ").lower        
-        return Purloin(player, opponent, hm)
+        hm = input("Purloin HP or MN: ")      
+        Purloin(player, opponent, hm)
     elif code == "am" and player.mana >= 25:
-        return AnitMinimise(player, opponent)
+        AnitMinimise(player, opponent, Round)
     elif code == "pm":
         mp = input("Purchase Mana: ")
         if player.hp >= mp*5:
-            return PurchaseMana(player, opponent, mp)
+            PurchaseMana(player, opponent, mp)
     elif code == "atp" and player.mana >= 100:
-        return AddTohealthPoints(player, opponent)
+        AddTohealthPoints(player, opponent)
     else:
         print("Choose again: ")
-
-# เทิร์นของผู้เล่น
 
 
 
@@ -140,31 +206,97 @@ def Chosen(code, player, opponent):
 SMSI = SingMeSheWit("Meme", 1000, 100)
 SMSII = SingMeSheWit("Nunu", 1000, 100)
 
-# ลูปรอบเกม
-
 
 # แสดงผลลัพธ์เมื่อเกมจบ
-print(SMSI.IsAlive())
-SMSI.DisplayVisables(1)
+Round = 1
+SMSI.DisplayVisables(Round)
+while SMSI.IsAlive() and SMSII.IsAlive():
+
+    code = input("CHOOSE: ")
+    Chosen(code, SMSI, SMSII, Round)
+    SMSII.DisplayVisables(Round)
+    code = input("CHOOSE: ")
+    Chosen(code, SMSII, SMSI, Round)
+    Round += 1
+    SMSI.DisplayVisables(Round)
 
 
-code = input("CHOOSE: ")
-Chosen(code, SMSI, SMSII)
+    if Round - SMSI.useanti >= 2:
+        SMSI.anti = False
+    if Round - SMSII.useanti >= 2:
+        SMSII.anti = False
+
+
+    if  SMSI.mana >= 80:
+        SMSI.mana = 100
+    else:
+        SMSI.mana += 20
+    if  SMSII.mana >= 80:
+        SMSII.mana = 100
+    else:
+        SMSII.mana += 20
+if SMSII.IsAlive() == False:
+    print("          /\__/\                                                 ( )__( )")
+    print("         ( ● ^ ●)                  | MEME |                      (X ^ X )")
+    print("        /(______)\/                | WON! |                    \/(______)\\")
+    print("          |    |                                                  |    |")
+if SMSI.IsAlive() == False:
+    print("          /\__/\                                                 ( )__( )")
+    print("         ( X ^ X)                  | NUNU |                      (● ^ ● )")
+    print("        /(______)\/                | WON! |                    \/(______)\\")
+    print("          |    |                                                  |    |")
+
+# ♧ = 10-50 damage
+# ◇ = 50-75 damage
+# ♡ = 150-175 damgage
+# ♤ = 350-500 damage
+# [Round: 1 》》Turn: Meme]
+# ________________________________________________________________________________
+#     P1 => HP: 1000                                          P2 => HP: 1000
+#           MN: 100                                                 MN: 100
+
+#           /\__/\                                                 ( )__( )
+#          ( ● ^ ●)                                                (● ^ ● )
+#         /(______)\/          ~♧                                \/(______)\
+#           |    |                                                  |    |
+#          P1: Meme                                                P2: Nunu
+# ________________________________________________________________________________
+
 
 # [Round: 1 》》Turn: Meme]
 # ________________________________________________________________________________
-#     P1 => HP: 1000                                           P2 => HP: 1000
-#           MN: 100                                                  MN: 100
-#          /\__/\                                                 ( )__( )
-#         ( ● ^ ●)  ♤♡◇♧ ~♡                              ○¤@๑   (● ^ ● )
-#        /(______)\/                                            \/(______)\
-#          |    |                                                  |    |
-#        P1: Meme                                                P2: Nunu
+#     P1 => HP: 1000                                          P2 => HP: 1000
+#           MN: 100                                                 MN: 100
+#                        _____
+#           /\__/\      /     \                                    ( )__( )
+#          ( ● ^ ●)     \     /                                    (● ^ ● )
+#         /(______)\/    \   /                                   \/(______)\
+#           |    |        \_/                                       |    |
+#          P1: Meme                                                P2: Nunu
 # ________________________________________________________________________________
 
 
+# [Round: 1 》》Turn: Meme]
+# ________________________________________________________________________________
+#     P1 => HP: 1000                                          P2 => HP: 1000
+#           MN: 100                                                 MN: 100
+#                                                       _____
+#           /\__/\                                     /     \     ( )__( )
+#          ( ● ^ ●)                                    \     /     (● ^ ● )
+#         /(______)\/                                   \   /    \/(______)\
+#           |    |                                       \_/        |    |
+#          P1: Meme                                                P2: Nunu
+# ________________________________________________________________________________
 
 
-
-
-
+# [Round: 1 》》Turn: Meme]
+# ________________________________________________________________________________
+#     P1 => HP: 1000                                          P2 => HP: 1000
+#           MN: 100                                                 MN: 100
+#                        _____                          _____
+#           /\__/\      /     \                        /     \     ( )__( )
+#          ( ● ^ ●)     \     /                        \     /     (● ^ ● )
+#         /(______)\/    \   /                          \   /    \/(______)\
+#           |    |        \_/                            \_/        |    |
+#          P1: Meme                                                P2: Nunu
+# ________________________________________________________________________________
